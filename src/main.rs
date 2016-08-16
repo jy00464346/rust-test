@@ -52,7 +52,7 @@ type Inch = u64;
 #[allow(non_camel_case_types)]
 type u64_t = u64;
 
-#[allow(overflowing_literals)]
+#[allow(overflowing_literals, unreachable_code)]
 fn main() {
     let a = 3.2f32;
     println!("1 + 2 = {}", 1u32 + 2);
@@ -129,5 +129,29 @@ fn main() {
             break 'outer;
         }
         println!("this code will never be reached");
+    }
+
+    /*let mut n = 1;
+    while n < 101 {
+        if n % 15 == 0 {
+            println!("fizzbuzz");
+        } else if n % 3 == 0 {
+            println!("fizz");
+        } else if n % 5 == 0 {
+            println!("buzz");
+        } else {
+            println!("{}", n);
+        }
+        n += 1;
+    }*/
+    struct Person {
+        name: Option<String>,
+    }
+
+    let name = "Steve".to_string();
+    let mut x: Option<Person> = Some(Person { name: Some(name) });
+    match x {
+        Some(Person { name: ref a @ Some(_), .. }) => println!("{:?}", a),
+        _ => {}
     }
 }
