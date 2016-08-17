@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
+#![feature(unboxed_closures)]
 
 use std::mem;
 use std::panic;
@@ -52,7 +53,7 @@ type Inch = u64;
 #[allow(non_camel_case_types)]
 type u64_t = u64;
 
-#[allow(overflowing_literals, unreachable_code)]
+#[allow(overflowing_literals, unused_mut, unreachable_code)]
 fn main() {
     let a = 3.2f32;
     println!("1 + 2 = {}", 1u32 + 2);
@@ -154,4 +155,90 @@ fn main() {
         Some(Person { name: ref a @ Some(_), .. }) => println!("{:?}", a),
         _ => {}
     }
+
+    let ref _is_a_reference = 5;
+
+    let value = 5;
+    let mut mut_value = 6;
+
+    match mut_value {
+        ref mut m => {
+            *m += 10;
+            println!("{}", m);
+        }
+    }
+    let pair = (2, -2);
+    match pair {
+        (x, y) if x == y =>
+            println!("These are twins"),
+        (x, y) if x + y == 0 =>
+            println!("antimatter ,kaboom"),
+        _ =>
+            println!("No correlation"),
+    };
+    let age = 15;
+    match age {
+        0 =>
+            println!("i'm 0"),
+        n @ 1...10 =>
+            println!("1-10 :{}", n),
+        n @ 11...20 =>
+            println!("11-20:{}", n),
+        n =>
+            println!("im {}", n)
+    };
+    let number = Some(7);
+    let letter: Option<i32> = None;
+    let emoticon: Option<i32> = None;
+
+    if let Some(i) = number {
+        println!("number is {}", i);
+    }
+    if let Some(i) = letter {} else {
+        println!("don't match a number. let 's go with a letter !");
+    }
+    let mut count = 0;
+    let mut inc = || {
+        count += 1;
+        println!("count {}", count);
+    };
+    inc();
+    inc();
+    //    let reborrow = &mut count;
+    let moveable = Box::new(3);
+    let consume = || {
+        println!("movable : {:?}", moveable);
+        mem::drop(moveable);
+    };
+    consume();
+    //    consume();
+    fn apply<F>(f: F) where F: FnOnce() {
+        f()
+    }
+    fn apply_to_3<F>(f: F) -> i32 where F: Fn(i32) -> i32 {
+        f(3)
+    }
+    let greeting = "hello";
+    let mut farewell = "goodbye".to_owned();
+    let diary = || {
+        // `greeting` 使用引用方式： 需要 `Fn`。
+        println!("I said {}.", greeting);
+        // 改变迫使 `farewell` 变成了通过可变引用来捕获。
+        // （ 原文： Mutation forces `farewell` to be
+        // captured by mutable reference.）
+        // 现在需要 `FnMut`。
+        farewell.push_str("!!!");
+        println!("Then I screamed {}.", farewell);
+        println!("Now I can sleep. zzzzz");
+        // 手动调用 drop 将 `farewell` 强制转成通过值来捕获。
+        // （ 原文： Manually calling drop forces `farewell` to
+        // be captured by value. Now requires `FnOnce`.）
+        // 现在需要 `FnOnce`。
+        mem::drop(farewell);
+    };
+    apply(diary);
+
+    let double = |x| 2 * x;
+    println!("3 doubled: {}", apply_to_3(double));
+//    println!("3 doubled: {}", apply_to_3(double))
 }
