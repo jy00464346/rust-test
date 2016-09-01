@@ -240,5 +240,64 @@ fn main() {
 
     let double = |x| 2 * x;
     println!("3 doubled: {}", apply_to_3(double));
-//    println!("3 doubled: {}", apply_to_3(double))
+    //    println!("3 doubled: {}", apply_to_3(double))
+
+    fn create_fn() -> Box<Fn()> {
+        let text = "Fn".to_owned();
+        Box::new(move || println!("This is a : {}", text))
+    }
+
+    fn create_fnmut() -> Box<FnMut()> {
+        let text = "FnMut".to_owned();
+        Box::new(move || println!("This is a :{}", text))
+    }
+
+    let fn_plain = create_fn();
+    let mut fnmut_plain = create_fnmut();
+    fn_plain();
+    fnmut_plain();
+
+    let vec1 = vec![1,2,3];
+    let vec2 = vec![4,5,6];
+    println!("2 in vec1 : {}", vec1.iter().any(|&x| x == 2));
+    println!("2 in vec1 : {}", vec2.into_iter().any(|x| x == 2));
+
+    let array1 = [1, 2, 3];
+    let array2 = [4, 5, 6];
+
+    println!("2 in array1 : {}", array1.iter().any(|&x| x == 2));
+    println!("2 in array2 : {}", array2.into_iter().any(|&x| x == 2));
+
+    let vec1 = vec![1,2,3];
+    let vec2 = vec![4,5,6];
+    println!("2 in vec1 : {:?}", vec1.iter().find(|&&x| x == 2));
+    println!("2 in vec1 : {:?}", vec2.into_iter().find(|&x| x == 2));
+
+    let array1 = [1, 2, 3];
+    let array2 = [4, 5, 6];
+
+    println!("2 in array1 : {:?}", array1.iter().find(|&&x| x == 2));
+    println!("2 in array2 : {:?}", array2.into_iter().find(|&&x| x == 2));
+
+    fn is_odd(n: u32) -> bool {
+        n % 2 == 1
+    }
+    println!("Find the sum of all the squared odd numbers under 1000");
+    let upper = 1000;
+    let mut acc = 0;
+    for n in 0.. {
+        let n_squared = n * n;
+        if n_squared >= upper {
+            break;
+        } else if is_odd(n_squared) {
+            acc += n_squared;
+        }
+    }
+    println!("imperative style : {}", acc);
+
+    let sum_of_squared_odd_numbers: u32 = (0..).map(|n| n * n)
+        .take_while(|&n| n < upper)
+        .filter(|&n| is_odd(n))
+        .fold(0, |sum, i| sum + i);
+    println!("functional style : {}", sum_of_squared_odd_numbers);
 }
